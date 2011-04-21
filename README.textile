@@ -1,7 +1,3 @@
 h1. CATMAPPER
 
 !http://catmapper.com/images/awesome.gif!
-
-FOR THE MOBILE CLIENT:
-
-http://code.google.com/p/catmapper-mobile/

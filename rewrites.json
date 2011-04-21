@@ -8,10 +8,6 @@
     "from": "style/*"
   },
   {
-    "to": "lib/*",
-    "from": "lib/*"
-  },
-  {
     "to": "script/*",
     "from": "script/*"
   },
@@ -20,11 +16,27 @@
     "from": "images/*"
   },
   {
-    "to": "vendor/*",
-    "from": "vendor/*"
+    "to": "index.html",
+    "from": ""
   },
   {
-    "to": "pages/index.html",
-    "from": ""
+    "to": "./",
+    "from": "ddoc"
+  },
+  {
+    "to": "./",
+    "from": "v1/api/_design/ddoc"
+  },
+  {
+    "to": "./*",
+    "from": "v1/api/_design/ddoc/*"
+  },
+  {
+    "to": "../../",
+    "from": "v1/api"
+  },
+  {
+    "to": "../../*",
+    "from": "v1/api/*"
   }
 ]
