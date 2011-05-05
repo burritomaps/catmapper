@@ -1,16 +1,18 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
-	<!-- Change this if you want to allow scaling -->
-  <meta name="viewport" content="width=default-width; user-scalable=no" />
+	<meta name="viewport" content="width=device-width, minimum-scale=1, maximum-scale=1"> 
 
   <meta http-equiv="Content-type" content="text/html; charset=utf-8">
 
   <title>CatMapper</title>
 
-	<link rel="stylesheet"  href="style/jquery.mobile-1.0a3.min.css" />
+	<link rel="stylesheet"  href="style/jquery.mobile-1.0a4.1.min.css" />
 	
 	<style type="text/css">
+  	#email-address {
+      font-size: 10px;
+    }
 		#icon-container{
 			margin-top: 4em;
 			text-align:center;
@@ -40,7 +42,7 @@
 	</style>
 	
 	<script src="script/jquery-1.4.3.min.js"></script>
-	<script src="script/jquery.mobile-1.0a3.min.js"></script>    
+	<script src="script/jquery.mobile-1.0a4.1.min.js"></script>    
   <script src="http://maps.google.com/maps/api/js?sensor=true"></script>
   <script type="text/javascript" charset="utf-8">
     var pictureSource, userAgent, media, map, catMarker, config;
@@ -52,7 +54,7 @@
     
     var locFail = function(e) {
       if (navigator.geolocation) {
-        err = "Error: The Geolocation service failed.";
+        err = "Cannot locate you -- Please enable geolocation in your settings";
       } else {
         err = "Error: Your browser doesnt support geolocation.";
       }
@@ -84,8 +86,18 @@
 		  return false;
   	}
   	
-  	function uploadWin() {
-  	  alert('CAT MAPPED');
+  	function uploadWin(doc) {
+  	  var id = JSON.parse(doc).id;
+  	  var uagent = navigator.userAgent.toLowerCase();
+      var plus = "+";
+  	  if (uagent.search("android") > -1) {
+  	    var plus = "%2B";
+  	  }
+  	  var email = "data" + plus + id + "@stockpil.es";
+      $('#email-address').text(email);
+      $('#email-link').attr('href', "mailto:" + email).css('-webkit-user-select', 'text');
+      $('.ui-content').append('<a class="dialog" href="#email" data-rel="dialog"></a>');
+      $('.dialog').click().remove();
   	}
 	
     function uploadLocation() {
@@ -209,7 +221,7 @@
         cfg.design = unescape( document.location.href ).split( '/' )[ 5 ];
         cfg.couchUrl = "/" + cfg.db + "/_design/" + cfg.design + "/_rewrite/";
       }
-      $('.mapit').bind('touchend',uploadLocation);
+      $('.mapit').bind('touchend', uploadLocation);
       onReady();
     });
   </script>
@@ -229,6 +241,18 @@
   			</div>
   			<a href="#" data-role="button" onclick="uploadLocation();">Record Cat Here</a> 
   		</div>
+  	</div>
+  	
+  	<div data-role="page" id="email"> 
+  		<div data-role="header" data-theme="e" data-position="inline"> 
+  			<h1>Success!</h1> 
+  		</div> 
+
+  		<div data-role="content" data-theme="e"> 
+  			<h1>Cat Mapped!</h1> 
+  			<p>Thanks! Email photos of the cat to:</p>
+  			<p><a id="email-link"><span id="email-address"></span></a></p> 
+  		</div> 
   	</div>
   </body>
 </html>
