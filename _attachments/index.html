@@ -5,84 +5,28 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="apple-touch-icon-precomposed" href="/custom_icon.png"/>
+  	<script src="script/jquery-1.6.min.js"></script>
     <script type="text/javascript" src="https://github.com/simplegeo/polymaps/raw/master/polymaps.min.js"></script>
     <title>CatMapper</title>
   	<link rel="stylesheet"  href="style/jquery.mobile-1.0a4.1.min.css" />
   	<style type="text/css">
-      html, body {
-        height: 100%;
-      }
-
-      body {
-        margin: 0;
-        background: #E5E0D9;
-      }
-      
-      path, circle {
-        stroke: #000;
-      }
-
-      svg {
-        display: block;
-        overflow: hidden;
-        width: 100%;
-        height: 100%;
-      }
-
-      #copy {
-        position: absolute;
-        left: 0;
-        bottom: 4px;
-        padding-left: 5px;
-        font: 9px sans-serif;
-        color: #fff;
-        cursor: default;
-      }
-
-      #copy a {
-        color: #fff;
-      }
-
-      .compass .back {
-        fill: #eee;
-        fill-opacity: .8;
-      }
-
-      .compass .fore {
-        stroke: #999;
-        stroke-width: 1.5px;
-      }
-
-      .compass rect.back.fore {
-        fill: #999;
-        fill-opacity: .3;
-        stroke: #eee;
-        stroke-width: 1px;
-        shape-rendering: crispEdges;
-      }
-
-      .compass .direction {
-        fill: none;
-      }
-
-      .compass .chevron {
-        fill: none;
-        stroke: #999;
-        stroke-width: 5px;
-      }
-
-      .compass .zoom .chevron {
-        stroke-width: 4px;
-      }
-
-      .compass .active .chevron, .compass .chevron.active {
-        stroke: #fff;
-      }
-
-      .compass.active .active .direction {
-        fill: #999;
-      }
-
+      html, body { height: 100%; }
+      body { margin: 0; background: #E5E0D9; }
+      path, circle { stroke: #000; }
+      svg { display: block; overflow: hidden; width: 100%; height: 100%; }
+      #copy { position: absolute; left: 0; bottom: 4px; padding-left: 5px; 
+              font: 9px sans-serif; color: #fff; cursor: default; }
+      #copy a { color: #fff; }
+      .compass .back { fill: #eee; fill-opacity: .8; }
+      .compass .fore { stroke: #999; stroke-width: 1.5px; } 
+      .compass rect.back.fore { fill: #999; fill-opacity: .3; stroke: #eee; 
+                                stroke-width: 1px; shape-rendering: crispEdges; }
+      .compass .direction { fill: none;}
+      .compass .chevron { fill: none; stroke: #999; stroke-width: 5px; }
+      .compass .zoom .chevron {stroke-width: 4px;}
+      .compass .active .chevron, .compass .chevron.active {stroke: #fff;}
+      .compass.active .active .direction { fill: #999; }
+  		.ui-btn { position: absolute; bottom: 5px; right: 5px;}
   		.crosshair {position: absolute; top: 80px; left: 0px;}
   		.left, .right, .top, .bottom {position: relative; background-color: #000; float: left;}
   		.left, .right {height: 10px; width: 60px;}
@@ -91,12 +35,7 @@
   		.left   {top: 85px; left: 0px;}
   		.right  {top: 85px; left: 180px;}
   		.bottom {top: 120px; left: 25px;}
-  		
-  		.ui-btn { position: absolute; bottom: 5px; right: 5px;}
   	</style>
-	
-  	<script src="script/jquery-1.6.min.js"></script>
-    
     <script type="text/javascript" charset="utf-8">
       var pictureSource, userAgent, media, map, catMarker, config;
   	  
@@ -133,7 +72,6 @@
         } else {
           locFail();
         }
-        // navigator.geolocation.getCurrentPosition(locWin, locFail);
     	}
     
     	function isMobile() {
@@ -194,13 +132,6 @@
       function capturePhotoEdit() {
     		navigator.camera.getPicture(camWin, camFail, {quality: 100, allowEdit: true }); 
       }
-    
-      function bbox(map) {
-        var bounds = map.getBounds();
-        var sw = bounds.getSouthWest();
-        var ne = bounds.getNorthEast();
-        return sw.lng() + "," + sw.lat() + "," + ne.lng() + "," + ne.lat();
-      }
       
       function center() {
         return {
@@ -215,7 +146,8 @@
         // Note: po.interact has built-in touch support!
         map = po.map()
             .container(document.getElementById("map").appendChild(po.svg("svg")))
-            .add(po.interact());
+            .add(po.interact())
+            .zoom(17)
 
         // Compute zoom offset for retina display.
         var dz = Math.log(window.devicePixelRatio || 1) / Math.LN2;
@@ -229,9 +161,11 @@
             .zoom(function(z) { return z + dz; }));
 
         window.addEventListener("touchend", function() {
-          var feature = po.geoJson().features( [{type: "Feature", geometry: center()}] );
-          map.add( feature );
+          if (catMarker) map.remove(catMarker);
+          catMarker = po.geoJson().features( [{type: "Feature", geometry: center()}] );
+          map.add( catMarker );
         }, false);
+        
         $('.crosshair').css('top', ($('#map').height() - 180) / 2);
       };
     
