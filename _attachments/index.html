@@ -94,17 +94,15 @@
 	
       function uploadLocation() {
         $('.ui-loader').show();
-        setTimeout(function() {
-          $.ajax({
-            url: config.couchUrl + "v1/api",
-            type: "POST",
-            contentType: "application/json",
-            data: JSON.stringify({
-              "geometry": center()
-            }),
-            success: uploadWin
-          });          
-        }, 5000)
+        $.ajax({
+          url: config.couchUrl + "v1/api",
+          type: "POST",
+          contentType: "application/json",
+          data: JSON.stringify({
+            "geometry": center()
+          }),
+          success: uploadWin
+        });          
     	}
   	
     	function camWin(imageData) {
@@ -239,7 +237,7 @@
         <p><a id="email-link"><span id="email-address"></span></a></p>
     	</div>
     </div>
-    <div class="ui-loader ui-body-a ui-corner-all" style="top: 679px;">
+    <div class="ui-loader ui-body-a ui-corner-all" style="top: 120px;">
       <span class="ui-icon ui-icon-loading spin"></span>
       <h1>loading</h1>
     </div>
