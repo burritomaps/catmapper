@@ -35,6 +35,7 @@
   		.left   {top: 85px; left: 0px;}
   		.right  {top: 85px; left: 180px;}
   		.bottom {top: 120px; left: 25px;}
+  		.detailsDialog {display: none;}
   	</style>
     <script type="text/javascript" charset="utf-8">
       var pictureSource, userAgent, media, map, catMarker, config;
@@ -81,6 +82,7 @@
     		}
   		  return false;
     	}
+  	
   	
     	function uploadWin(doc) {
     	  var id = JSON.parse(doc).id;
@@ -165,8 +167,9 @@
           catMarker = po.geoJson().features( [{type: "Feature", geometry: center()}] );
           map.add( catMarker );
         }, false);
-        
-        $('.crosshair').css('top', ($('#map').height() - 180) / 2);
+        var mapHeight = $('#map').height();
+        $('.crosshair').css('top', (mapHeight - 180) / 2);
+        $('.detailsDialog').css('min-height', mapHeight);
       };
     
       $(function() {
@@ -196,7 +199,17 @@
           cfg.design = unescape( document.location.href ).split( '/' )[ 5 ];
           cfg.couchUrl = "/" + cfg.db + "/_design/" + cfg.design + "/_rewrite/";
         }
-        // $('.mapit').bind('touchend', uploadLocation);
+        
+        $('.closeDialog').click(function(e) {
+          $('.detailsDialog').hide();
+          e.preventDefault();
+        })
+        
+        $('.catButton').click(function(e) {
+          $('.detailsDialog').show();
+          e.preventDefault();
+        })
+        
         onReady();
       });
     </script>
@@ -208,11 +221,21 @@
 			<div class="left"></div>
 			<div class="bottom"></div>
 		</div>
-		<a href="#" data-role="button" data-icon="delete" data-theme="c" class="ui-btn ui-btn-icon-left ui-btn-corner-all ui-shadow ui-btn-down-c ui-btn-hover-c">
+		<a href="#" data-role="button" data-icon="delete" data-theme="c" class="catButton ui-btn ui-btn-icon-left ui-btn-corner-all ui-shadow ui-btn-down-c ui-btn-hover-c">
 		  <span class="ui-btn-inner ui-btn-corner-all">
 		    <span class="ui-btn-text">Record Cat Here</span>
         <span class="ui-icon ui-icon-delete ui-icon-shadow"></span>
       </span>
     </a>
+    <div data-role="dialog" class="detailsDialog ui-dialog ui-page ui-body-a ui-page-active" role="dialog">
+    	<div data-role="header" data-theme="d" data-position="inline" class="ui-corner-top ui-overlay-shadow ui-bar-d ui-header" role="banner"><a href="#" data-icon="delete" data-rel="back" data-iconpos="notext" class="closeDialog ui-btn-left ui-btn ui-btn-up-d ui-btn-icon-notext ui-btn-corner-all ui-shadow" title="Close" data-theme="d"><span class="ui-btn-inner ui-btn-corner-all"><span class="ui-btn-text">Close</span><span class="ui-icon ui-icon-delete ui-icon-shadow"></span></span></a>
+    		<h1 class="ui-title" tabindex="0" role="heading" aria-level="1">CatMapper</h1>
+    	</div>
+    	<div data-role="content" data-theme="c" class="ui-content ui-body-c ui-corner-bottom ui-overlay-shadow" role="main">
+    		<h1>Cat Mapped!</h1>
+    		<p>Thanks! Email photos of the cat to:</p>
+        <p><a id="email-link"><span id="email-address"></span></a></p>
+    	</div>
+    </div>
   </body>
 </html>
