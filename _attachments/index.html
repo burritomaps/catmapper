@@ -38,7 +38,7 @@
   		.detailsDialog {display: none;}
   	</style>
     <script type="text/javascript" charset="utf-8">
-      var pictureSource, userAgent, media, map, catMarker, config;
+      var pictureSource, userAgent, media, map, po, catMarker, config;
   	  
   	  function hideURLbar() {
         window.scrollTo(0,1);
@@ -60,15 +60,10 @@
         showMap(42.35017139318913, -71.04257583618164);
       };
 	
-    	function preventBehavior(e) { 
-        e.preventDefault(); 
-      }
-    	document.addEventListener("touchmove", preventBehavior, false);
-	
     	function onReady() {
     	  hideURLbar();
     		if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(locWin, locFail);
+          navigator.geolocation.getCurrentPosition(locWin, locFail, { enableHighAccuracy:true });
           // also monitor position as it changes
         } else {
           locFail();
@@ -83,8 +78,8 @@
   		  return false;
     	}
   	
-  	
     	function uploadWin(doc) {
+    	  $('.ui-loader').hide();
     	  var id = JSON.parse(doc).id;
     	  var uagent = navigator.userAgent.toLowerCase();
         var plus = "+";
@@ -92,22 +87,24 @@
     	    var plus = "%2B";
     	  }
     	  var email = "data" + plus + id + "@stockpil.es";
+    	  $('.mapMessage').text("Email photos of this cat to:");
         $('#email-address').text(email);
-        $('#email-link').attr('href', "mailto:" + email).css('-webkit-user-select', 'text');
-        $('.ui-content').append('<a class="dialog" href="#email" data-rel="dialog"></a>');
-        $('.dialog').click().remove();
+        $('#email-link').attr('href', "mailto:" + email);
     	}
 	
       function uploadLocation() {
-        $.ajax({
-          url: config.couchUrl + "v1/api",
-          type: "POST",
-          contentType: "application/json",
-          data: JSON.stringify({
-            "geometry": center()
-          }),
-          success: uploadWin
-        });
+        $('.ui-loader').show();
+        setTimeout(function() {
+          $.ajax({
+            url: config.couchUrl + "v1/api",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify({
+              "geometry": center()
+            }),
+            success: uploadWin
+          });          
+        }, 5000)
     	}
   	
     	function camWin(imageData) {
@@ -141,9 +138,15 @@
           "coordinates": [map.center().lon, map.center().lat]
         }
       }
+      
+      function placeDot() {
+        if (catMarker) map.remove(catMarker);
+        catMarker = po.geoJson().features( [{type: "Feature", geometry: center()}] );
+        map.add( catMarker );
+      }
     
       function showMap(latitude, longitude) {
-        var po = org.polymaps;
+        po = org.polymaps;
 
         // Note: po.interact has built-in touch support!
         map = po.map()
@@ -162,11 +165,9 @@
             .hosts(["a.", "b.", "c.", ""]))
             .zoom(function(z) { return z + dz; }));
 
-        window.addEventListener("touchend", function() {
-          if (catMarker) map.remove(catMarker);
-          catMarker = po.geoJson().features( [{type: "Feature", geometry: center()}] );
-          map.add( catMarker );
-        }, false);
+        window.addEventListener("touchend", placeDot, false);
+        placeDot();
+        
         var mapHeight = $('#map').height();
         $('.crosshair').css('top', (mapHeight - 180) / 2);
         $('.detailsDialog').css('min-height', mapHeight);
@@ -207,6 +208,7 @@
         
         $('.catButton').click(function(e) {
           $('.detailsDialog').show();
+          uploadLocation();
           e.preventDefault();
         })
         
@@ -233,9 +235,13 @@
     	</div>
     	<div data-role="content" data-theme="c" class="ui-content ui-body-c ui-corner-bottom ui-overlay-shadow" role="main">
     		<h1>Cat Mapped!</h1>
-    		<p>Thanks! Email photos of the cat to:</p>
+    		<p class="mapMessage"></p>
         <p><a id="email-link"><span id="email-address"></span></a></p>
     	</div>
+    </div>
+    <div class="ui-loader ui-body-a ui-corner-all" style="top: 679px;">
+      <span class="ui-icon ui-icon-loading spin"></span>
+      <h1>loading</h1>
     </div>
   </body>
 </html>
