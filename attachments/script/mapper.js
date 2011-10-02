@@ -53,7 +53,8 @@ function uploadLocation() {
       "geometry": app.lastLocation,
       "crowdsourced": true,
       "title": $('#title').val(),
-      "description": $('#description').val()
+      "description": $('#description').val(),
+      "created": new Date()
     }),
     success: function() {
       $(':input').val('');
